@@ -38,6 +38,7 @@ class AntiRepeatPlugin(Star):
         if len(self.last_messages[group_id]) == self.message_limit and all(
             msg == message_text for msg in self.last_messages[group_id]
         ):
+            self.last_messages[group_id] = []  # 清空记录，防止重复触发
             yield event.plain_result("检测到复读消息！")
 
     async def terminate(self):
