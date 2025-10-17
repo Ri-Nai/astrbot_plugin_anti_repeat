@@ -23,7 +23,7 @@ class AntiRepeatPlugin(Star):
         self.last_messages = {}  # 用于存储每个群的最后一条消息
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
-    async def on_listen(self, event: AstrMessageEvent, arg: str = None):
+    async def on_listen(self, event: AstrMessageEvent):
         """监听群消息，防止复读"""
         group_id = event.get_group_id()
         if self.group_list and group_id not in self.group_list:
