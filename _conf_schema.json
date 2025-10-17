@@ -5,7 +5,7 @@
   },
   "message_limit": {
     "description": "允许的重复消息次数",
-    "type": "integer",
+    "type": "int",
     "default": 3
   },
   "need_recall": {
