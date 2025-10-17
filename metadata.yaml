@@ -1,0 +1,11 @@
+name: astrbot_plugin_anti_repeat
+desc: 一个基于 LLM 的历史聊天记录防复读插件，支持打断（或者撤回）复读消息。
+help: |
+  群聊使用: /消息总结 [数量或时间范围]
+  示例: /消息总结 100 或 /消息总结 1h
+  
+  私聊使用: /群总结 [数量或时间] [群号]
+  示例: /群总结 100 123456789
+version: v1.4.0
+author: Ri-Nai
+repo: https://github.com/Ri-Nai/astrbot_plugin_anti_repeat

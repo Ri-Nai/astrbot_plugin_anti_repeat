@@ -1,0 +1,16 @@
+{
+  "group_list": {
+    "description": "需要使用的群组列表",
+    "type": "list"
+  },
+  "message_limit": {
+    "description": "允许的重复消息次数",
+    "type": "integer",
+    "default": 3
+  },
+  "need_recall": {
+    "description": "是否启用撤回功能",
+    "type": "boolean",
+    "default": false
+  }
+}
