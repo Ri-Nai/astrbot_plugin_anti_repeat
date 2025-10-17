@@ -38,7 +38,7 @@ class AntiRepeatPlugin(Star):
         if len(self.last_messages[group_id]) == self.message_limit and all(
             msg == message_text for msg in self.last_messages[group_id]
         ):
-            yield event.plain_text("检测到复读消息！")
+            yield event.plain_result("检测到复读消息！")
 
     async def terminate(self):
         """插件卸载时的清理操作"""
