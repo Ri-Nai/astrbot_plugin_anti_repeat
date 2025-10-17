@@ -10,7 +10,7 @@
   },
   "need_recall": {
     "description": "是否启用撤回功能",
-    "type": "boolean",
+    "type": "bool",
     "default": false
   }
 }
