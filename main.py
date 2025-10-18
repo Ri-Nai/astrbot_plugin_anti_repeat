@@ -16,8 +16,7 @@ def message_to_dict(message: BaseMessageComponent):
         return {
             "type": "Image",
             "data": {
-                "file": message.data.file,
-                "url": message.data.url
+                "file": message.file,
             },
         }
     else:
