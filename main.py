@@ -30,7 +30,8 @@ class AntiRepeatPlugin(Star):
         group_id = event.get_group_id()
         client = event.bot
         if self.user_id is None:
-            self.user_id = await client.api.call_action("get_login_info").get("user_id")
+            login_info = await client.api.call_action("get_login_info")
+            self.user_id = login_info.get("user_id")
         if self.group_list and group_id not in self.group_list:
             return  # 如果配置了群列表且当前群不在列表中，则忽略
         message = event.get_message_obj()
