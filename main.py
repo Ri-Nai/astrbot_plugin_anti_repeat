@@ -21,25 +21,61 @@ class AntiRepeatPlugin(Star):
         self.message_limit = config.get("message_limit", 3)
         self.need_recall = config.get("need_recall", False)
         self.last_messages = {}  # 用于存储每个群的最后一条消息
+        self.roles = {}  # 用于存储每个群的角色信息
+        self.user_id = None  # 机器人自己的用户ID
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
     async def on_listen(self, event: AstrMessageEvent):
         """监听群消息，防止复读"""
         group_id = event.get_group_id()
+        client = event.bot
+        if self.user_id is None:
+            self.user_id = await client.api.call_action("get_login_info").get("user_id")
         if self.group_list and group_id not in self.group_list:
             return  # 如果配置了群列表且当前群不在列表中，则忽略
-        message_text = event.get_message_str()
+        message = event.get_message_obj()
+        message_content = message.raw_message
+        message_id = message.message_id
+
         if group_id not in self.last_messages:
             self.last_messages[group_id] = []
-        self.last_messages[group_id].append(message_text)
+        self.last_messages[group_id].append(message_content)
         if len(self.last_messages[group_id]) > self.message_limit:
             self.last_messages[group_id].pop(0)
+
+        if group_id not in self.roles:
+            group_info = await client.api.call_action(
+                "get_group_member_info",
+                {
+                    "group_id": group_id,
+                    "user_id": self.user_id,
+                },
+            )
+            self.roles[group_id] = group_info.get("role", "member")
+        can_recall = self.roles[group_id] in ["admin", "owner"] and self.need_recall
         # 检查是否复读
         if len(self.last_messages[group_id]) == self.message_limit and all(
-            msg == message_text for msg in self.last_messages[group_id]
+            msg == message_content for msg in self.last_messages[group_id]
         ):
-            self.last_messages[group_id] = []  # 清空记录，防止重复触发
-            yield event.plain_result("检测到复读消息！")
+            if can_recall:
+                try:
+                    await client.api.call_action(
+                        "delete_msg",
+                        {
+                            "message_id": message_id,
+                        },
+                    )
+                    self.last_messages[group_id].pop()  # 移除刚撤回的消息，防止重复触发
+                    yield event.plain_result(
+                        f"检测到复读消息{message_content}，已撤回！"
+                    )
+                except Exception as e:
+                    yield event.plain_result(
+                        f"检测到复读消息{message_content}，但撤回失败：{e}"
+                    )
+            else:
+                self.last_messages[group_id] = []  # 清空记录，防止重复触发
+                yield event.plain_result(f"检测到复读消息{message_content}！")
 
     async def terminate(self):
         """插件卸载时的清理操作"""
