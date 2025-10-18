@@ -4,7 +4,24 @@ from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import AstrBotConfig
 from astrbot.core import logger
+from astrbot.api.message_components import (
+    Image,
+    BaseMessageComponent,
+)
 
+
+def message_to_dict(message: BaseMessageComponent):
+    """将消息组件转换为字典形式，便于比较"""
+    if isinstance(message, Image):
+        return {
+            "type": "Image",
+            "data": {
+                "file": message.data.file,
+                "url": message.data.url
+            },
+        }
+    else:
+        return message.to_dict()
 
 @register(
     "astrbot_plugin_anti_repeat",
@@ -35,7 +52,7 @@ class AntiRepeatPlugin(Star):
         if self.group_list and group_id not in self.group_list:
             return  # 如果配置了群列表且当前群不在列表中，则忽略
         message = event.message_obj
-        message_content = message.raw_message.get("raw_message")
+        message_content = str(list(map(message_to_dict, message.message)))
         message_id = message.message_id
 
         if group_id not in self.last_messages:
