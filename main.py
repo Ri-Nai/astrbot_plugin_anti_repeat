@@ -21,7 +21,7 @@ def message_to_dict(message: BaseMessageComponent):
             },
         }
     else:
-        return message.to_dict()
+        return message.toDict()
 
 @register(
     "astrbot_plugin_anti_repeat",
@@ -52,9 +52,11 @@ class AntiRepeatPlugin(Star):
         if self.group_list and group_id not in self.group_list:
             return  # 如果配置了群列表且当前群不在列表中，则忽略
         message = event.message_obj
+        message_str = event.message_str
         message_content = str(list(map(message_to_dict, message.message)))
         message_id = message.message_id
-
+        if message_content == "[]" or message_content.strip() == "":
+            return  # 忽略空消息
         if group_id not in self.last_messages:
             self.last_messages[group_id] = []
         self.last_messages[group_id].append(message_content)
@@ -81,15 +83,15 @@ class AntiRepeatPlugin(Star):
                     )
                     self.last_messages[group_id].pop()  # 移除刚撤回的消息，防止重复触发
                     yield event.plain_result(
-                        f"检测到复读消息{message_content}，已撤回！"
+                        f"检测到复读消息{message_str}，已撤回！"
                     )
                 except Exception as e:
                     yield event.plain_result(
-                        f"检测到复读消息{message_content}，但撤回失败：{e}"
+                        f"检测到复读消息{message_str}，但撤回失败：{e}"
                     )
             else:
                 self.last_messages[group_id] = []  # 清空记录，防止重复触发
-                yield event.plain_result(f"检测到复读消息{message_content}！")
+                yield event.plain_result(f"检测到复读消息{message_str}！")
 
     async def terminate(self):
         """插件卸载时的清理操作"""
