@@ -35,10 +35,10 @@ class AntiRepeatPlugin(Star):
         if self.group_list and group_id not in self.group_list:
             return  # 如果配置了群列表且当前群不在列表中，则忽略
         message = event.message_obj
-        message_content = message.raw_message
+        message_content = message.raw_message.get("raw_message")
         message_id = message.message_id
         
-        logger.info(f"收到群消息，群号：{group_id}，内容：{message_content}")
+        logger.info(f"收到群消息，群号：{group_id}，message：{message}，内容：{message_content}")
 
         if group_id not in self.last_messages:
             self.last_messages[group_id] = []
