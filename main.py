@@ -37,8 +37,6 @@ class AntiRepeatPlugin(Star):
         message = event.message_obj
         message_content = message.raw_message.get("raw_message")
         message_id = message.message_id
-        
-        logger.info(f"收到群消息，群号：{group_id}，message：{message}，内容：{message_content}")
 
         if group_id not in self.last_messages:
             self.last_messages[group_id] = []
