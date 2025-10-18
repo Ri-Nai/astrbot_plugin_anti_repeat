@@ -37,6 +37,8 @@ class AntiRepeatPlugin(Star):
         message = event.message_obj
         message_content = message.raw_message
         message_id = message.message_id
+        
+        logger.info(f"收到群消息，群号：{group_id}，内容：{message_content}")
 
         if group_id not in self.last_messages:
             self.last_messages[group_id] = []
@@ -51,7 +53,7 @@ class AntiRepeatPlugin(Star):
                 user_id=self.user_id,
             )
             self.roles[group_id] = group_info.get("role", "member")
-        can_recall = self.roles[group_id] in ["admin", "owner"] and self.need_recall
+        can_recall = self.roles[group_id] in ("admin", "owner") and self.need_recall
         # 检查是否复读
         if len(self.last_messages[group_id]) == self.message_limit and all(
             msg == message_content for msg in self.last_messages[group_id]
