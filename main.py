@@ -47,10 +47,8 @@ class AntiRepeatPlugin(Star):
         if group_id not in self.roles:
             group_info = await client.api.call_action(
                 "get_group_member_info",
-                {
-                    "group_id": group_id,
-                    "user_id": self.user_id,
-                },
+                group_id=group_id,
+                user_id=self.user_id,
             )
             self.roles[group_id] = group_info.get("role", "member")
         can_recall = self.roles[group_id] in ["admin", "owner"] and self.need_recall
@@ -62,9 +60,7 @@ class AntiRepeatPlugin(Star):
                 try:
                     await client.api.call_action(
                         "delete_msg",
-                        {
-                            "message_id": message_id,
-                        },
+                        message_id=message_id,
                     )
                     self.last_messages[group_id].pop()  # 移除刚撤回的消息，防止重复触发
                     yield event.plain_result(
