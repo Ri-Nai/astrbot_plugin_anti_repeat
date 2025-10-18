@@ -34,7 +34,7 @@ class AntiRepeatPlugin(Star):
             self.user_id = login_info.get("user_id")
         if self.group_list and group_id not in self.group_list:
             return  # 如果配置了群列表且当前群不在列表中，则忽略
-        message = event.get_message_obj()
+        message = event.message_obj
         message_content = message.raw_message
         message_id = message.message_id
 
