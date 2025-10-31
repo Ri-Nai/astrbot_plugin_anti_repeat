@@ -25,6 +25,7 @@ def message_to_dict(message: BaseMessageComponent):
     else:
         return message.toDict()
 
+
 @register(
     "astrbot_plugin_anti_repeat",
     "Ri-Nai",
@@ -55,7 +56,15 @@ class AntiRepeatPlugin(Star):
             return  # 如果配置了群列表且当前群不在列表中，则忽略
         message = event.message_obj
         message_str = event.message_str
-        message_dicts = list(filter(lambda x: x is not None, map(message_to_dict, message.message)))
+        message_dicts = list(
+            filter(
+                lambda x: x is not None,
+                map(
+                    message_to_dict,
+                    message.message,
+                ),
+            )
+        )
         message_id = message.message_id
         if not message_dicts:
             return  # 忽略空消息
@@ -85,9 +94,7 @@ class AntiRepeatPlugin(Star):
                         message_id=message_id,
                     )
                     self.last_messages[group_id].pop()  # 移除刚撤回的消息，防止重复触发
-                    yield event.plain_result(
-                        f"检测到复读消息{message_str}，已撤回！"
-                    )
+                    yield event.plain_result(f"检测到复读消息{message_str}，已撤回！")
                 except Exception as e:
                     yield event.plain_result(
                         f"检测到复读消息{message_str}，但撤回失败：{e}"
