@@ -1,6 +1,6 @@
 # /astrbot_plugin_anti_repeat/main.py
 
-from astrbot.api.event import filter, AstrMessageEvent
+from astrbot.api.event import filter as astr_filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import AstrBotConfig
 from astrbot.core import logger
@@ -20,7 +20,7 @@ def message_to_dict(message: BaseMessageComponent):
                 "file": message.file,
             },
         }
-    if isinstance(message, Poke):
+    elif isinstance(message, Poke):
         return None  # 忽略戳一戳消息
     else:
         return message.toDict()
@@ -44,7 +44,7 @@ class AntiRepeatPlugin(Star):
         self.roles = {}  # 用于存储每个群的角色信息
         self.user_id = None  # 机器人自己的用户ID
 
-    @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
+    @astr_filter.event_message_type(astr_filter.EventMessageType.GROUP_MESSAGE)
     async def on_listen(self, event: AstrMessageEvent):
         """监听群消息，防止复读"""
         group_id = event.get_group_id()
