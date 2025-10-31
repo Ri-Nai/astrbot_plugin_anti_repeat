@@ -6,6 +6,7 @@ from astrbot.api import AstrBotConfig
 from astrbot.core import logger
 from astrbot.api.message_components import (
     Image,
+    Poke,
     BaseMessageComponent,
 )
 
@@ -19,6 +20,8 @@ def message_to_dict(message: BaseMessageComponent):
                 "file": message.file,
             },
         }
+    if isinstance(message, Poke):
+        return None  # 忽略戳一戳消息
     else:
         return message.toDict()
 
@@ -52,10 +55,11 @@ class AntiRepeatPlugin(Star):
             return  # 如果配置了群列表且当前群不在列表中，则忽略
         message = event.message_obj
         message_str = event.message_str
-        message_content = str(list(map(message_to_dict, message.message)))
+        message_dicts = list(filter(lambda x: x is not None, map(message_to_dict, message.message)))
         message_id = message.message_id
-        if message_content == "[]" or message_content.strip() == "":
+        if not message_dicts:
             return  # 忽略空消息
+        message_content = str(message_dicts)
         if group_id not in self.last_messages:
             self.last_messages[group_id] = []
         self.last_messages[group_id].append(message_content)
